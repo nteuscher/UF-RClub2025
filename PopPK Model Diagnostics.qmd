@@ -87,8 +87,8 @@ filter <- dplyr::filter
 mutate <- dplyr::mutate
 
 # set the the path and name of a folder with all figures
-scriptname <- stringr::str_remove(basename(rstudioapi::getActiveDocumentContext()$path),'.Rmd')   
-knitr::opts_chunk$set(fig.path=paste0("./",scriptname,"/"))
+# scriptname <- stringr::str_remove(basename(rstudioapi::getActiveDocumentContext()$path),'.Rmd')   
+# knitr::opts_chunk$set(fig.path=paste0("./",scriptname,"/"))
 
 
 # FUNCTIONS------------------------------------------------------
@@ -235,7 +235,15 @@ data1 %<>% mutate(FOODf = factor(case_when(FOOD == 0 ~ 'Fasting',
 
 ```
 
-# Goodness of Fit Plots
+# Model diagnostics
+
+:::{.panel-tabset}
+## Goodness of fit
+
++ Observed versus predicted have a trend that lies along the line of unity suggesting agreement between structural model and observed concentrations
++ All 3 conditional weighted residuals have a trend that lies along Y = 0 suggesting no bias in residuals with time, or predictions
++ The trend for the individual weighted residuals versus individual predictions is flat suggesting the residual error model is adequate
+
 ```{r}
 #| warning: false
 #| message: false
@@ -249,3 +257,155 @@ dat <- gof_read_data(file = paste0(dir.models,'ppk3.tab'))
 gof(dat)
 ```
 
+## Parameter table
+
+```{r}
+temp <- extToTable(model = paste0(dir.models,'ppk3.ext')) %>% as.data.frame()
+temp %<>% slice(1:n()-1) %>% 
+  mutate(Theta.RSE = as.numeric(str_sub(Theta.RSE,start = 2,end = -2))*100,
+         Omega.Est = as.numeric(Omega.Est)*100,
+         Omega.RSE = as.numeric(str_sub(Omega.RSE,start = 2,end = -2))*100,
+         Sigma.Est = as.numeric(Sigma.Est)*100,
+         Sigma.Est = case_when(is.na(Sigma.Est) ~ "",TRUE ~ as.character(Sigma.Est)),
+         Sigma.RSE = as.numeric(str_sub(Sigma.RSE,start = 2,end = -2))*100,
+         Sigma.RSE = case_when(is.na(Sigma.RSE) ~ "",TRUE ~ as.character(Sigma.RSE)))
+temp$Theta.ID <- c("CL (L/hr)","Vc (L)","Q (L/hr)","Vp (L)","Ka (1/hr)")
+temp$Omega.ID <- c("IIV CL","IIV Vc","IIV Q","IIV Vp","IIV Ka")
+temp$Sigma.ID <- c("Prop error (%)","","","","")
+temp %>% flextable() %>% 
+  colformat_num(big.mark = "", na_str = "") %>% 
+  align(j=c(2,3,4,5,8,9), align = "right", part = "all") %>%
+  align(j=c(1,4,7), align = "left", part = "all") %>%
+  bold(bold = TRUE, part = "header") %>% 
+  set_header_labels(Theta.ID = "Parameter",Theta.Est = "Estimate",Theta.RSE = "RSE",
+                    Omega.ID = "IIV",Omega.Est = "%CV",Omega.RSE = "RSE",
+                    Sigma.ID = "Residual Error",Sigma.Est = "Estimate",Sigma.RSE = "RSE") %>%
+  add_footer_lines("IIV and residual errors calcualted as square root of omega and sigma variance values, respectively.") %>% 
+  autofit()
+```
+
+## Individual fits (semilog)
+:::{.panel-tabset}
+```{r}
+#| echo: true
+#| warning: false
+#| message: false
+#| results: asis
+#| fig-width: 6
+#| fig-height: 4 
+
+#define a unique plotting identifier that combines items of interest: ID, study, food effect
+obs2 = dat %>%
+  left_join(data1 %>% select(ID,SEXf,FOODf) %>% distinct() %>% rename_with(tolower)) %>% 
+  mutate(my.id = paste0("Subject: ",id,"\n",foodf," (",sexf,")" ))
+
+
+#lets keep only 1 instance of each unique plotting identifier
+temp1 = obs2 %>% select(my.id) %>%
+  filter(!duplicated(my.id))
+
+#ids per page
+ids.per.page = 9
+#how many pages will we need. The ceiling function ensures that we have whole numbers
+my.pages = ceiling(nrow(temp1) / ids.per.page)  #
+
+#determine the number of IDs on the last page
+ids.on.last.page = round(((nrow(temp1) / ids.per.page)-(my.pages-1))*ids.per.page)
+
+#generate a list of page numbers for all IDs
+temp2 = NULL
+for (i in 1:(my.pages)) {
+  #i=7
+ 
+ 
+  if (i < my.pages){
+    #for all but the last page, there will be 12 ids per page
+    temp = c(rep(i,ids.per.page))
+  } else {
+    #the last page will have ids.on.last.page
+    temp = c(rep(my.pages,ids.on.last.page))
+  }
+ 
+  temp2 = c(temp2,temp)
+}
+
+#Now append our page groups to our ID groups
+temp1$pages = temp2
+
+#Finally, append the grouping columns and unique plotting identifiers to the full dataset
+obs2 %<>% left_join(temp1)
+
+
+obs2.long = obs2 %>%
+  select(ipred,pred,everything()) %>%
+  tidyr::gather(obs,values,ipred:pred)
+
+# Semilog Time after first dose
+for (j in unique(obs2$pages)) {
+  #j=1
+  cat(paste0('### Page ',j, "\n\n"))
+  plot= ggplot(obs2 %>% filter(pages==j),aes(x=tad,y=dv))+
+    geom_point()+
+    geom_line(data=obs2.long %>% filter(pages==j),aes(x=tad,y=values,linetype=obs,color=obs))+
+    scale_y_log10()+
+    #lims(y=c(0,max(obs2.long %>% filter(pages==j) %>% select(values))))+
+    # scale_x_continuous(breaks=c(seq(0,720,180))) +  #limits = c(0,max(obs2$TIME)),
+    facet_wrap(~my.id,scales = 'free',ncol = 3)+
+    labs(#title=paste0(j),
+      y=conc_label,
+      x='Time After Dose (hours)') +
+    scale_color_manual(values = c("dodgerblue","sienna3"), labels = c("Individual","Population"))+
+    scale_linetype(labels = c("Individual","Population"))+
+    my.Theme +
+    theme(strip.text.x = element_text(size = 7.5),
+          axis.title   = element_text(size = 12),
+          axis.text    = element_text(size = 8))
+ 
+  print(plot + theme(strip.text = element_text(size = 8,margin = margin(.05, 0, .05, 0, "cm"))))
+ 
+  cat('\n\n')
+}
+
+```
+:::
+
+## Individual fits (linear)
+:::{.panel-tabset}
+```{r}
+#| echo: true
+#| warning: false
+#| message: false
+#| results: asis
+#| fig-width: 6
+#| fig-height: 4 
+
+# Semilog Time after first dose
+for (j in unique(obs2$pages)) {
+  #j=1
+  cat(paste0('### Page ',j, "\n\n"))
+  plot= ggplot(obs2 %>% filter(pages==j),aes(x=tad,y=dv))+
+    geom_point()+
+    geom_line(data=obs2.long %>% filter(pages==j),aes(x=tad,y=values,linetype=obs,color=obs))+
+    #scale_y_log10()+
+    #lims(y=c(0,max(obs2.long %>% filter(pages==j) %>% select(values))))+
+    # scale_x_continuous(breaks=c(seq(0,720,180))) +  #limits = c(0,max(obs2$TIME)),
+    facet_wrap(~my.id,scales = 'free',ncol = 3)+
+    labs(#title=paste0(j),
+      y=conc_label,
+      x='Time After Dose (hours)') +
+    scale_color_manual(values = c("dodgerblue","sienna3"), labels = c("Individual","Population"))+
+    scale_linetype(labels = c("Individual","Population"))+
+    my.Theme +
+    theme(strip.text.x = element_text(size = 7.5),
+          axis.title   = element_text(size = 12),
+          axis.text    = element_text(size = 8))
+ 
+  print(plot + theme(strip.text = element_text(size = 8,margin = margin(.05, 0, .05, 0, "cm"))))
+ 
+  cat('\n\n')
+}
+
+```
+:::
+
+:::
