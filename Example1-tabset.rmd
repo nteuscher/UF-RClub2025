@@ -1,0 +1,129 @@
+---
+title: "Example of colored tabs"
+subtitle: "Sponsor | Drug in indication" 
+author: "Nathan Teuscher"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output:
+  html_document:
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    df_print: paged
+    code_folding: hide
+toctitle: Contents
+---
+
+```{css echo=FALSE}
+/* Define css styles */
+body{
+      font-size: 18px;
+}
+
+table.Rtable1 {
+    font-size: 18px;
+}
+
+.Rtable1 footnote {
+  font-size: 12px;
+}
+
+
+/* This colors the text of the pill labels */
+/* This only affects class="green" */
+/* The n+2 means that tab 2 to n will have text of this color */
+/* So if you do n+3 it would start at tab 3. */
+/* To do a specific tab, just do a number (without n+) */
+/* This will affect ALL navigation tabs!! */
+  
+.green>.nav-pills>li:nth-child(n+2)>a {
+  color: #53b733; /* green */
+}
+
+/* This colors the background of the pill when selected */
+/* This only affects class="green" */
+/* The n+2 means that tab 2 to n will have text of this color */
+/* So if you do n+3 it would start at tab 3. */
+/* To do a specific tab, just do a number (without n+) */
+/* This will affect ALL navigation tabs!! */
+
+.green>.nav-pills>li.active:nth-child(n+2)>a {
+  color: #fff; /* white */
+  background-color: #53b733; /* green */
+}
+
+```
+
+```{r packages, include=FALSE}
+#--- Set up options ---# 
+#knitr::opts_chunk(echo = TRUE, message = FALSE, warning = FALSE, comment = NA, collapse=TRUE)
+
+library(knitr)
+library(tidyverse)
+# library(PKPDmisc)
+# library(SASxport)
+# library(openxlsx)
+# library(janitor)
+# library(EnvStats)
+# library(DescTools)
+# library(summarytools)
+# library(yaml)
+# library(flextable)
+# library(officer)
+# library(table1c)
+# library(DT)
+# library(data.table)
+# library(tidyvpc)
+# library(ggcertara)
+# library(xpose)
+# library(imager)
+# library(PerformanceAnalytics)
+# library(GGally)
+# library(linpk)
+# library(coveffectsplot)
+
+```
+
+This example shows you you can create tabs in an HTML document when using RMarkdown. The first chunk includes CSS or cascading style sheets that can format the look and feel of materials on the output HTML page. The CSS is embedded in the document and only visible in the RMarkdown file. 
+
+# Green Tabset {.tabset .tabset-fade .tabset-pills class="green"}
+
+This is a custom tab coloring where the first tab is Blue and the next tabs are all green in color. Note that the tab text and highlighting changes.
+
+## Tab 1
+
+This tab is blue in color. Also notice that code can be embedded within each tab group and then it is hidden when you move to another tab group.
+
+```{r}
+temp <- 3*24
+
+```
+
+
+## Tab 2
+
+This tab is green in color
+
+## Tab 3
+
+This one is also green. There is different code here.
+
+```{r}
+dat <- data.frame(x = seq(0:100)) %>% mutate(y = (x/(x+50)))
+plot1 <- ggplot(data = dat, aes(x = x, y = y)) +
+  geom_line()
+plot1
+```
+
+# Not green Tabset {.tabset .tabset-fade .tabset-pills}
+
+## Tab 1
+
+This tab is blue
+
+## Tab 2
+
+This one is blue too
+
+## Tab 3
+
+And this one is blue

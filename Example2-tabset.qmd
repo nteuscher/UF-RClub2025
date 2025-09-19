@@ -1,0 +1,135 @@
+---
+title: "Tabset example in Quarto"
+author: "Nathan Teuscher"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+format: 
+  html:
+    toc: true
+    toc-depth: 4
+    toc-title: "Contents"
+    toc-location: left
+    code-fold: true
+    embed-resources: true
+---
+
+```{css echo=FALSE}
+/* Define css styles */
+body{
+      font-size: 18px;
+}
+
+/* --- Green panel-tabset styling (works for both Bootstrap 3 & 5 patterns) --- */
+
+/* Base: make tab text green for `.panel-tabset.green-tabs` */
+.panel-tabset.green-tabs .nav-tabs > li > a,
+.panel-tabset.green-tabs .nav-tabs .nav-link {
+  color: green !important;
+}
+
+/* Active tab styling for tabs 2..n */
+/* Bootstrap 3 style (li.active > a) */
+.panel-tabset.green-tabs .nav-tabs > li:nth-child(n+2).active > a,
+.panel-tabset.green-tabs .nav-tabs > li:nth-child(n+2) > a.active {
+  background-color: green !important;
+  color: white !important;
+}
+
+/* Bootstrap 5 style (.nav-item .nav-link.active inside nth-child li) */
+.panel-tabset.green-tabs .nav-tabs .nav-item:nth-child(n+2) .nav-link.active {
+  background-color: green !important;
+  color: white !important;
+}
+
+/* Hover for non-first tabs */
+.panel-tabset.green-tabs .nav-tabs > li:nth-child(n+2) > a:hover,
+.panel-tabset.green-tabs .nav-tabs .nav-item:nth-child(n+2) .nav-link:hover {
+  background-color: #c6e6c6 !important;
+  color: black !important;
+}
+
+/* Ensure first tab remains default (no green background / color) */
+.panel-tabset.green-tabs .nav-tabs > li:first-child > a,
+.panel-tabset.green-tabs .nav-tabs .nav-item:first-child .nav-link {
+  background-color: inherit !important;
+  color: inherit !important;
+}
+```
+
+```{r packages, include=FALSE}
+#--- Set up options ---# 
+#knitr::opts_chunk(echo = TRUE, message = FALSE, warning = FALSE, comment = NA, collapse=TRUE)
+
+library(knitr)
+library(tidyverse)
+# library(PKPDmisc)
+# library(SASxport)
+# library(openxlsx)
+# library(janitor)
+# library(EnvStats)
+# library(DescTools)
+# library(summarytools)
+# library(yaml)
+# library(flextable)
+# library(officer)
+# library(table1c)
+# library(DT)
+# library(data.table)
+# library(tidyvpc)
+# library(ggcertara)
+# library(xpose)
+# library(imager)
+# library(PerformanceAnalytics)
+# library(GGally)
+# library(linpk)
+# library(coveffectsplot)
+
+```
+
+This example shows you you can create tabs in an HTML document when using RMarkdown. The first chunk includes CSS or cascading style sheets that can format the look and feel of materials on the output HTML page. The CSS is embedded in the document and only visible in the RMarkdown file. 
+
+# Green Tabset
+
+This is a custom tab coloring where the first tab is Blue and the next tabs are all green in color. Note that the tab text and highlighting changes.
+
+::: {.panel-tabset .green-tabs}
+## Tab 1
+
+This tab is blue in color. Also notice that code can be embedded within each tab group and then it is hidden when you move to another tab group.
+
+```{r}
+temp <- 3*24
+
+```
+
+
+## Tab 2
+
+This tab is green in color
+
+## Tab 3
+
+This one is also green. There is different code here.
+
+```{r}
+dat <- data.frame(x = seq(0:100)) %>% mutate(y = (x/(x+50)))
+plot1 <- ggplot(data = dat, aes(x = x, y = y)) +
+  geom_line()
+plot1
+```
+:::
+
+# Not green Tabset {.tabset .tabset-fade .tabset-pills}
+
+::: {.panel-tabset}
+## Tab 1
+
+This tab is blue
+
+## Tab 2
+
+This one is blue too
+
+## Tab 3
+
+And this one is blue
+:::
