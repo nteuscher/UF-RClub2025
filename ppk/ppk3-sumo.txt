@@ -13,8 +13,8 @@ Covariance step                                                   [    OK   ]
 Condition number                                                  [    OK   ]   
 Correlations                                                      [    OK   ]   
 
-Estimation time for subproblem, sum over $EST (seconds):   74.86
-Covariance time for subproblem, sum over $EST (seconds):   73.58
+Estimation time for subproblem, sum over $EST (seconds):   75.15
+Covariance time for subproblem, sum over $EST (seconds):   73.75
 
 Objective function value: 17194.0247
 

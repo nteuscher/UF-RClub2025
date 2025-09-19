@@ -1,5 +1,5 @@
 Fri 09/19/2025 
-05:02 PM
+05:09 PM
 $PROBLEM    PK model
 ;----------------------------------
 $INPUT      C ID TIME TAD DV MDV EVID AMT ADDL II WT HV CRCL AGE SEX
@@ -49,8 +49,8 @@ $COVARIANCE PRINT=E
 ;----------------------------------
 
 ; OUTPUT
-$TABLE      ID TIME TAD DV MDV EVID WT HV CRCL AGE SEX FOOD RACE ALT
-            AST ALB CL V2 Q V3 KA ETAS(1:LAST) IPRED IRES IWRES CWRES
+$TABLE      ID TIME TAD MDV EVID WT HV CRCL AGE SEX FOOD RACE ALT AST
+            ALB CL V2 Q V3 KA ETAS(1:LAST) IPRED IRES IWRES CWRES
             ONEHEADER NOPRINT FILE=ppk3.tab
 ;----------------------------------
 
@@ -156,7 +156,7 @@ Days until program expires : 180
  RFORMAT:
  FIXED_EFFECT_ETAS:
 0USER-CHOSEN ITEMS:
- ID TIME TAD DV MDV EVID WT HV CRCL AGE SEX FOOD RACE ALT AST ALB CL V2 Q V3 KA ETA1 ETA2 ETA3 ETA4 ETA5 IPRED IRES IWRES
+ ID TIME TAD MDV EVID WT HV CRCL AGE SEX FOOD RACE ALT AST ALB CL V2 Q V3 KA ETA1 ETA2 ETA3 ETA4 ETA5 IPRED IRES IWRES
  CWRES
 1DOUBLE PRECISION PREDPP VERSION 7.5.1
 
@@ -343,8 +343,8 @@ Days until program expires : 180
  TOTAL EFFECTIVE ETAS (NIND*NETA):                          1000
   
  #TERE:
- Elapsed estimation  time in seconds:    74.86
- Elapsed covariance  time in seconds:    73.58
+ Elapsed estimation  time in seconds:    75.15
+ Elapsed covariance  time in seconds:    73.75
  Elapsed postprocess time in seconds:     0.69
 1
  
@@ -844,8 +844,8 @@ Days until program expires : 180
  
          3.45E-01  5.83E-01  5.91E-01  7.96E-01  9.05E-01  9.63E-01  1.01E+00  1.14E+00  1.30E+00  1.47E+00  1.89E+00
  
- Elapsed finaloutput time in seconds:     1.64
- #CPUT: Total CPU Time in Seconds,      153.188
+ Elapsed finaloutput time in seconds:     1.59
+ #CPUT: Total CPU Time in Seconds,      153.625
 Stop Time: 
 Fri 09/19/2025 
-05:05 PM
+05:11 PM
