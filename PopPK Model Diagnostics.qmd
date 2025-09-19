@@ -1,0 +1,251 @@
+---
+title: "Tabset example in Quarto"
+author: "Nathan Teuscher"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+format: 
+  html:
+    toc: true
+    toc-depth: 4
+    toc-title: "Contents"
+    toc-location: left
+    code-fold: true
+    embed-resources: true
+---
+
+```{css echo=FALSE}
+/* Define css styles */
+body{
+      font-size: 18px;
+}
+
+/* --- Green panel-tabset styling (works for both Bootstrap 3 & 5 patterns) --- */
+
+/* Base: make tab text green for `.panel-tabset.green-tabs` */
+.panel-tabset.green-tabs .nav-tabs > li > a,
+.panel-tabset.green-tabs .nav-tabs .nav-link {
+  color: green !important;
+}
+
+/* Active tab styling for tabs 2..n */
+/* Bootstrap 3 style (li.active > a) */
+.panel-tabset.green-tabs .nav-tabs > li:nth-child(n+2).active > a,
+.panel-tabset.green-tabs .nav-tabs > li:nth-child(n+2) > a.active {
+  background-color: green !important;
+  color: white !important;
+}
+
+/* Bootstrap 5 style (.nav-item .nav-link.active inside nth-child li) */
+.panel-tabset.green-tabs .nav-tabs .nav-item:nth-child(n+2) .nav-link.active {
+  background-color: green !important;
+  color: white !important;
+}
+
+/* Hover for non-first tabs */
+.panel-tabset.green-tabs .nav-tabs > li:nth-child(n+2) > a:hover,
+.panel-tabset.green-tabs .nav-tabs .nav-item:nth-child(n+2) .nav-link:hover {
+  background-color: #c6e6c6 !important;
+  color: black !important;
+}
+
+/* Ensure first tab remains default (no green background / color) */
+.panel-tabset.green-tabs .nav-tabs > li:first-child > a,
+.panel-tabset.green-tabs .nav-tabs .nav-item:first-child .nav-link {
+  background-color: inherit !important;
+  color: inherit !important;
+}
+```
+
+```{r packages, include=FALSE}
+# Clear all objects
+rm(list=ls())
+
+#--- Set up options ---# 
+#knitr::opts_chunk(echo = TRUE, message = FALSE, warning = FALSE, comment = NA, collapse=TRUE)
+
+library(tidyverse)
+library(magrittr)
+# library(xgxr)
+# library(corrplot)
+# library(kableExtra)
+library(table1)
+library(flextable)
+library(officer)
+# library(cowplot)
+# library(GGally)
+# library(rstatix)    # function add_significance: Add p-value significance symbols into a data frame.
+# # function t_test: performs t-test 
+# # function adjust_pvalue: add an adjusted p-value column into a data frame 
+# library(ggpubr)     # function stat_pvalue_manual: add p-values to a ggplot
+library(ggcertara)
+library(gridExtra)
+#library(mrgmisc)
+library(nonmem2R)
+library(tidyvpc)
+
+select = dplyr::select
+filter <- dplyr::filter
+mutate <- dplyr::mutate
+
+# set the the path and name of a folder with all figures
+scriptname <- stringr::str_remove(basename(rstudioapi::getActiveDocumentContext()$path),'.Rmd')   
+knitr::opts_chunk$set(fig.path=paste0("./",scriptname,"/"))
+
+
+# FUNCTIONS------------------------------------------------------
+# fton converts a factor to a numeric variable
+fton<-function(x){
+  as.numeric(as.character(x))
+}
+
+# to add numbers on boxplots
+give.n <- function(x, upper_limit =NA){   ## position can be adjusted
+  return(
+    data.frame(
+      y =  max(x,na.rm=T)*1.15, 
+      label = paste("n=",length(x)) )) 
+  # experiment with the multiplier to find the perfect position
+  
+}
+
+# ggplot settings: set preferred themes that are used multiple times to reduce the amount of in-text code in the script
+# my theme with no legend title
+my.Theme = theme_bw() +
+  theme(legend.title     = element_blank(),
+        axis.line        = element_line(colour = 'black'),
+        plot.background  = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border     = element_blank())
+
+# source directory: specify relative path to modeling dataset
+dir.models = './ppk/'
+dir.data = './ppk/'
+
+# flag for labeling figures as draft (i.e. "Draft" or ""). Used with xgxr package.
+status = "" 
+
+#units and labels (adjust as needed)
+##############
+analyte            = 'drug-123'
+analyte2           = 'drug-123'
+time_units_dataset = "hours"
+time_units_plot    = "hours"
+time_label1        = paste0("Time Since First Dose (",time_units_plot,")")
+time_label2        = paste0("Time After Dose (",time_units_plot,")")
+time_label3        = paste0("Nominal Time After Dose (",time_units_plot,")")
+dose_label         = "Dose (mg)"   # \U00B5 is the unicode for micro
+dose_units         = "mg"
+conc_units         = "ng/mL"
+conc_units2        = "pg/mL"
+conc_label         = paste0(analyte," Concentration (",conc_units,")" ) 
+conc_label2        = paste0(analyte2," Concentration (",conc_units2,")" ) 
+
+## set the names of your variables here
+# nominaltsfd <- 'NTSFD'
+actualtad   <- 'TAD'
+depvar      <- 'DV'
+actualtime  <- 'TIME'
+idvar       <- 'ID'
+idvar2      <- 'ORIGID'
+blqvar      <- 'BLQ'
+
+
+```
+
+# Import analysis data
+```{r}
+#| warning: false
+#| message: false
+#| results: false
+#| 
+
+data0  = read.csv(paste0(dir.data,'poppk.csv')) %>% rename_with(toupper)
+# str(data0) 
+data1 <- data0
+data1 %<>% mutate(AMT = fton(AMT),
+                  DV = fton(DV),
+                  TIME = fton(TIME),
+                  TAD = fton(TAD)) #change to numeric. Note: %<>% (magrittr package) updates lhs object.
+
+
+##############
+# Event ID 
+# unique(data1$EVID) # 1 0
+# 0=observation
+# 1=dose
+# 2=Other-type event.  The DV data  item  is  ignored.   Dose-related data  items  must  be zero.
+# 4=dose after washout period
+
+# quick checks
+# names(data1)
+#  [1] "C"    "ID"   "TIME" "TAD"  "DV"   "MDV"  "EVID" "AMT"  "ADDL" "II"   "WT"   "HV"   "CRCL" "AGE"  "SEX"  "FOOD" "RACE" "ALT"  "AST" 
+# [20] "ALB" 
+
+data1 %<>% mutate(EVIDf = case_when(EVID == 0 ~ 'Observation',
+                                    EVID == 1 ~ 'Dose'),
+                  EVIDf = factor(EVIDf, levels = c("Dose","Observation")))
+
+# data1 %>% group_by(EVIDf) %>% tally()
+# # A tibble: 2 × 2
+#   EVIDf           n
+#   <fct>       <int>
+# 1 Dose          200
+# 2 Observation  4472
+
+data1 %<>% mutate(SEXf = factor(case_when(SEX==1~'Male',
+                                          SEX==0~'Female'),
+                                levels = c('Male','Female')))
+data1 %<>% mutate(RACEf = factor(case_when(RACE==0~'Caucasian',
+                                           RACE==1~'Black',
+                                           RACE==2~'Asian',
+                                           RACE==3~'Native American',
+                                           RACE==4~'Pacific Islander',
+                                           RACE==5~'Other',
+                                           RACE==6~'Multiple',
+                                           RACE==7~"Australian Aborigine",
+                                           RACE==-99~'Missing'),
+                                 levels = c('Caucasian','Black','Asian',
+                                            'Native American','Pacific Islander','Other','Multiple',"Australian Aborigine",'Missing')))
+data1 %<>% mutate(FOODf = factor(case_when(FOOD == 0 ~ 'Fasting',
+                                           FOOD == 1 ~ 'Fed'),
+                                 levels = c('Fasting','Fed')))
+# data1 %>% group_by(SEXf) %>% distinct(ID) %>% tally()
+# # A tibble: 2 × 2
+#   SEXf       n
+#   <fct>  <int>
+# 1 Male     124
+# 2 Female    76
+
+# data1 %>% group_by(RACEf) %>% distinct(ID) %>% tally()
+# # A tibble: 5 × 2
+#   RACEf                n
+#   <fct>            <int>
+# 1 Caucasian          104
+# 2 Black               18
+# 3 Asian               49
+# 4 Native American     18
+# 5 Pacific Islander    11
+
+# data1 %>% group_by(FOODf) %>% distinct(ID) %>% tally()
+# # A tibble: 2 × 2
+#   FOODf       n
+#   <fct>   <int>
+# 1 Fasting   179
+# 2 Fed        21
+
+```
+
+# Goodness of Fit Plots
+```{r}
+#| warning: false
+#| message: false
+#| results: false
+#| fig-width: 6
+#| fig-height: 4
+
+
+dat <- gof_read_data(file = paste0(dir.models,'ppk3.tab')) 
+
+gof(dat)
+```
+
