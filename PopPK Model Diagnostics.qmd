@@ -305,7 +305,7 @@ temp1 = obs2 %>% select(my.id) %>%
   filter(!duplicated(my.id))
 
 #ids per page
-ids.per.page = 9
+ids.per.page = 4
 #how many pages will we need. The ceiling function ensures that we have whole numbers
 my.pages = ceiling(nrow(temp1) / ids.per.page)  #
 
@@ -350,7 +350,7 @@ for (j in unique(obs2$pages)) {
     scale_y_log10()+
     #lims(y=c(0,max(obs2.long %>% filter(pages==j) %>% select(values))))+
     # scale_x_continuous(breaks=c(seq(0,720,180))) +  #limits = c(0,max(obs2$TIME)),
-    facet_wrap(~my.id,scales = 'free',ncol = 3)+
+    facet_wrap(~my.id,scales = 'free',ncol = 2)+
     labs(#title=paste0(j),
       y=conc_label,
       x='Time After Dose (hours)') +
@@ -389,7 +389,7 @@ for (j in unique(obs2$pages)) {
     #scale_y_log10()+
     #lims(y=c(0,max(obs2.long %>% filter(pages==j) %>% select(values))))+
     # scale_x_continuous(breaks=c(seq(0,720,180))) +  #limits = c(0,max(obs2$TIME)),
-    facet_wrap(~my.id,scales = 'free',ncol = 3)+
+    facet_wrap(~my.id,scales = 'free',ncol = 2)+
     labs(#title=paste0(j),
       y=conc_label,
       x='Time After Dose (hours)') +
