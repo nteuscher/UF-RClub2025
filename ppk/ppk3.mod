@@ -49,6 +49,7 @@ $COV PRINT=E
 ;----------------------------------
 ; OUTPUT
 $TABLE ID WT HV CRCL AGE SEX FOOD RACE ALT AST ALB 
-       CL V2 Q V3 KA ETAS(1:LAST) ONEHEADER NOPRINT 
+       CL V2 Q V3 KA ETAS(1:LAST) 
+	   IPRED IRES IWRES CWRES ONEHEADER NOPRINT	   
        FILE=ppk3.tab
 ;----------------------------------

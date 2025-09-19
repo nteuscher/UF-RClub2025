@@ -1,0 +1,35 @@
+-----------------------------------------------------------------------
+
+ppk3.lst
+
+Successful minimization                                           [    OK   ]   
+No rounding errors                                                [    OK   ]   
+No zero gradients                                                 [    OK   ]   
+No final zero gradients                                           [    OK   ]   
+Hessian not reset                                                 [    OK   ]   
+No parameter near boundary                                        [    OK   ]   
+Covariance step                                                   [    OK   ]   
+
+Condition number                                                  [    OK   ]   
+Correlations                                                      [    OK   ]   
+
+Estimation time for subproblem, sum over $EST (seconds):   75.13
+Covariance time for subproblem, sum over $EST (seconds):   74.34
+
+Objective function value: 17194.0247
+
+Condition number: 5.485
+
+Number of observation records: 4472
+Number of individuals: 200
+
+                    THETA                      OMEGA                                    SIGMA             
+        Clearance   19.82  (0.02618)  IIV CL  0.3567  (0.04592)  residual variability  0.3126  (0.01323)  
+   Volume central   37.82  (0.06558)  IIV V2  0.4988   (0.1251)                                           
+                Q   13.22  (0.05879)   IIV Q  0.6856  (0.05725)                                           
+Volume peripheral   324.7  (0.03721)  IIV V3  0.4373  (0.06242)                                           
+               Ka  0.3007  (0.04053)  IIV KA  0.3177  (0.08802)                                           
+
+The relative standard errors for omega and sigma are reported on the approximate
+standard deviation scale (SE/variance estimate)/2.
+-----------------------------------------------------------------------
