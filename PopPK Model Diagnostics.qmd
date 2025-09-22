@@ -1,5 +1,5 @@
 ---
-title: "Tabset example in Quarto"
+title: "Population PK example in Quarto"
 author: "Nathan Teuscher"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 format: 
