@@ -53,6 +53,52 @@ body{
   background-color: inherit !important;
   color: inherit !important;
 }
+
+/* -----------div tips------------- */
+
+div.summary {
+padding: 1em;
+margin: 1em;
+padding-left: 50px;
+background-size: 30px;
+background-repeat: no-repeat;
+background-position: 10px 10px;
+min-height: 40px;
+font-size: 16px;
+color: #000000;
+background-color: #bed3ec;
+border: solid 5px #dfedff;
+}
+
+div.datainfo {
+padding: 1em;
+margin: 1em;
+padding-left: 50px;
+background-size: 30px;
+background-repeat: no-repeat;
+background-position: 10px 10px;
+min-height: 40px;
+font-size: 16px;
+color: #000000;
+background-color: #FAD07D;
+border: solid 5px #FFDE9C;
+}
+
+div.guidance {
+padding: 1em;
+margin: 1em;
+padding-left: 50px;
+background-size: 30px;
+background-repeat: no-repeat;
+background-position: 10px 10px;
+min-height: 40px;
+font-size: 16px;
+color: #000000;
+background-color: #F58C87;
+border: solid 5px #FCC0BD;
+}
+
+
 ```
 
 ```{r packages, include=FALSE}
@@ -116,6 +162,10 @@ plot1 <- ggplot(data = dat, aes(x = x, y = y)) +
   geom_line()
 plot1
 ```
+:::
+
+::: summary
+This is some additional information about the first section and not the second.
 :::
 
 # Not green Tabset {.tabset .tabset-fade .tabset-pills}

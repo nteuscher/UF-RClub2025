@@ -2256,6 +2256,46 @@ color: black !important;
 background-color: inherit !important;
 color: inherit !important;
 }
+
+div.summary {
+padding: 1em;
+margin: 1em;
+padding-left: 50px;
+background-size: 30px;
+background-repeat: no-repeat;
+background-position: 10px 10px;
+min-height: 40px;
+font-size: 16px;
+color: #000000;
+background-color: #bed3ec;
+border: solid 5px #dfedff;
+}
+div.datainfo {
+padding: 1em;
+margin: 1em;
+padding-left: 50px;
+background-size: 30px;
+background-repeat: no-repeat;
+background-position: 10px 10px;
+min-height: 40px;
+font-size: 16px;
+color: #000000;
+background-color: #FAD07D;
+border: solid 5px #FFDE9C;
+}
+div.guidance {
+padding: 1em;
+margin: 1em;
+padding-left: 50px;
+background-size: 30px;
+background-repeat: no-repeat;
+background-position: 10px 10px;
+min-height: 40px;
+font-size: 16px;
+color: #000000;
+background-color: #F58C87;
+border: solid 5px #FCC0BD;
+}
 </style>
 </div>
 <p>This example shows you you can create tabs in an HTML document when using RMarkdown. The first chunk includes CSS or cascading style sheets that can format the look and feel of materials on the output HTML page. The CSS is embedded in the document and only visible in the RMarkdown file.</p>
@@ -2297,6 +2337,9 @@ color: inherit !important;
 </div>
 </div>
 </div>
+</div>
+<div class="summary">
+<p>This is some additional information about the first section and not the second.</p>
 </div>
 </section>
 <section id="not-green-tabset" class="level1 tabset tabset-fade tabset-pills">
